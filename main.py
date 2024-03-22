@@ -35,13 +35,11 @@ class HttpHandler(BaseHTTPRequestHandler):
         match router:
             case "/":
                 self.send_html("index.html")
-            case "/me":
-                self.send_html("contact.html")
-            case "/blog":
-                self.render_template("blog.jinja")
+            case "/message":
+                self.send_html("message.html")
             case _:
                 file = BASE_DIR.joinpath(router[1:])
                 if file.exists():
                     self.send_static(file)
                 else:
-                    self.send_html("404.html", 404)
+                    self.send_html("error.html", 404)
