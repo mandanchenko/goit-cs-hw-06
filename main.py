@@ -16,7 +16,7 @@ URI = "mongodb://mongodb:27017"
 
 
 SOCKET_HOST = "127.0.0.1"
-SOCKET_PORT = 80
+SOCKET_PORT = 3000
 
 
 def send_data_to_socket(data):
@@ -30,7 +30,7 @@ class HttpHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         data = self.rfile.read(int(self.headers["Content-Length"]))
         send_data_to_socket(data)
-        self.send_response(200)
+        self.send_response(302)
         self.send_header("Location", "/")
         self.end_headers()
 
@@ -86,9 +86,12 @@ def save_data(data):
     data_parse = urllib.parse.unquote_plus(data.decode())
     try:
         data_parse = {
-            key: value for key, value in [el.split("=") for el in data_parse.split("&")]
+            "date": str(datetime.now()),
+            **{
+                key: value
+                for key, value in [el.split("=") for el in data_parse.split("&")]
+            },
         }
-        data_parse["date"] = str(datetime.now())
         db.messages.insert_one(data_parse)
     except Exception as e:
         logging.error(e)
