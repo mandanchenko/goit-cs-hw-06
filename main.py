@@ -36,6 +36,7 @@ class HttpHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         router = urllib.parse.urlparse(self.path).path
+        logging.info(router)
         match router:
             case "/":
                 self.send_html("index.html")
@@ -44,7 +45,7 @@ class HttpHandler(BaseHTTPRequestHandler):
             case _:
                 file = pathlib.Path(router[1:])
                 if file.exists():
-                    self.send_static(file)
+                    self.send_static()
                 else:
                     self.send_html("error.html", 404)
 
@@ -55,8 +56,8 @@ class HttpHandler(BaseHTTPRequestHandler):
         with open(filename, "rb") as f:
             self.wfile.write(f.read())
 
-    def send_static(self, status=200):
-        self.send_response(int(status))
+    def send_static(self):
+        self.send_response(200)
         mimetype = mimetypes.guess_type(self.path)
         if mimetype:
             self.send_header("Content-type", mimetype[0])
